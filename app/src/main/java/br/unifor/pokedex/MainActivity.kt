@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.card_pokemon.view.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
-    lateinit var  adapter: CardAdapter
+    lateinit var adapter: CardAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,17 +35,17 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.navigation_home -> {
 
-                cardView.textViewCard.setText("home")
+                cardView.textViewCard.text = "home"
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_dashboard -> {
 
-                cardView.textViewCard.setText("dashboard")
+                cardView.textViewCard.text = "dashboard"
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_notifications -> {
 
-                cardView.textViewCard.setText("notifications")
+                cardView.textViewCard.text = "notifications"
                 return@OnNavigationItemSelectedListener true
             }
         }
