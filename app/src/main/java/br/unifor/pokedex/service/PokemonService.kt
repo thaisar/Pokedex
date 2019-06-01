@@ -10,4 +10,7 @@ interface PokemonService {
     @GET("pokemon/{id}/")
     fun getPokemon(@Path("id") id: Int): Call<Pokemon>
 
+    @GET("pokemon/{name}/")
+    fun getPokemon(@Path("name") name: String): Call<Pokemon>
+
 }

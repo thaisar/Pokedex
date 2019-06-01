@@ -10,8 +10,12 @@ object PokeApiService {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    fun getPokemonService():PokemonService {
-
+    fun getPokemonService(): PokemonService {
         return retrofit.create(PokemonService::class.java)
     }
+
+    fun getPokemonListService(): PokemonListService {
+        return retrofit.create(PokemonListService::class.java)
+    }
+
 }
