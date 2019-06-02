@@ -3,6 +3,7 @@ package br.unifor.pokedex.adapter
 import android.content.Context
 import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,13 +17,14 @@ import com.squareup.picasso.Picasso
 class PokemonListAdapter(context: Context, private val pokemonList: ArrayList<PokemonList.Results>) :
     RecyclerView.Adapter<PokemonListAdapter.PokemonViewHolder>() {
 
-    var listener: ItemClickHandle? = null
+    var itemClickHandleListener: ItemClickHandle? = null
+    var onBottomReachedListener: OnBottomReachedListener? = null
 
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PokemonViewHolder {
         val itemView = layoutInflater.inflate(R.layout.card_pokemon, parent, false)
-        return PokemonViewHolder(itemView, listener!!)
+        return PokemonViewHolder(itemView, itemClickHandleListener!!)
     }
 
     override fun getItemCount(): Int {
@@ -31,13 +33,18 @@ class PokemonListAdapter(context: Context, private val pokemonList: ArrayList<Po
 
     override fun onBindViewHolder(holder: PokemonViewHolder, position: Int) {
         if (pokemonList.isNotEmpty()) {
+            if(position == pokemonList.size - 1){
+                onBottomReachedListener?.onBottomReached(position)
+            }
             holder.name.text = pokemonList[position].name
             val num = pokemonList[position].url.drop(34).dropLast(1)
+            Log.i("APP", num)
             Picasso.get()
                 .load("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$num.png")
-                .resize(250, 250)
+                .fit()
                 .centerCrop()
                 .placeholder(R.drawable.question_mark)
+                .error(R.drawable.question_mark)
                 .into(holder.image)
         }
     }

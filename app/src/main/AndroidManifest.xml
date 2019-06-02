@@ -20,6 +20,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".PokemonProfileActivity">
+        </activity>
+
     </application>
 
 </manifest>
