@@ -18,8 +18,8 @@ class PokemonProfileActivity: AppCompatActivity() {
     private lateinit var pokemonProfile: Pokemon
     private lateinit var image: ImageView
     private lateinit var name: TextView
-    private lateinit var type1: TextView
-    private lateinit var type2: TextView
+    private lateinit var type1: ImageView
+    private lateinit var type2: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,8 +30,8 @@ class PokemonProfileActivity: AppCompatActivity() {
 
         image = findViewById(R.id.imageViewPokemonProfile)
         name = findViewById(R.id.textViewPokemonProfile)
-        type1 = findViewById(R.id.textViewType1)
-        type2 = findViewById(R.id.textViewType2)
+        type1 = findViewById(R.id.imageViewType1)
+        type2 = findViewById(R.id.imageViewType2)
 
         val pokemonId = intent.getIntExtra("pokemonId", 0)
         val pokemon = PokeApiService.getPokemonService().getPokemon(pokemonId)
@@ -49,19 +49,77 @@ class PokemonProfileActivity: AppCompatActivity() {
     private val pokemonCallbackHandler = object : Callback<Pokemon> {
         override fun onResponse(call: Call<Pokemon>, response: Response<Pokemon>) {
             pokemonProfile = response.body()!!
-            name.text = pokemonProfile.name
+            name.text = pokemonProfile.name.capitalize()
+
+            val type1s: String?
+            val type2s: String?
 
             if(pokemonProfile.types.size == 2){
-                type1.text = pokemonProfile.types[1].type.name
-                type2.text = pokemonProfile.types[0].type.name
+                type1s = pokemonProfile.types[1].type.name
+                type2s = pokemonProfile.types[0].type.name
             }else{
-                type1.text = pokemonProfile.types[0].type.name
-                type2.text = ""
+                type1s = pokemonProfile.types[0].type.name
+                type2s = ""
             }
+
+            val type1i = when(type1s){
+                "bug" -> R.drawable.type_bug
+                "dark" -> R.drawable.type_dark
+                "dragon" -> R.drawable.type_dragon
+                "electric" -> R.drawable.type_electric
+                "fairy" -> R.drawable.type_fairy
+                "fighting" -> R.drawable.type_fighting
+                "fire" -> R.drawable.type_fire
+                "flying" -> R.drawable.type_flying
+                "ghost" -> R.drawable.type_ghost
+                "grass" -> R.drawable.type_grass
+                "ground" -> R.drawable.type_ground
+                "ice" -> R.drawable.type_ice
+                "normal" -> R.drawable.type_normal
+                "poison" -> R.drawable.type_poison
+                "psychic" -> R.drawable.type_psychic
+                "rock" -> R.drawable.type_rock
+                "steel" -> R.drawable.type_steel
+                "water" -> R.drawable.type_water
+                else -> R.drawable.type_none
+            }
+            val type2i = when(type2s){
+                "bug" -> R.drawable.type_bug
+                "dark" -> R.drawable.type_dark
+                "dragon" -> R.drawable.type_dragon
+                "electric" -> R.drawable.type_electric
+                "fairy" -> R.drawable.type_fairy
+                "fighting" -> R.drawable.type_fighting
+                "fire" -> R.drawable.type_fire
+                "flying" -> R.drawable.type_flying
+                "ghost" -> R.drawable.type_ghost
+                "grass" -> R.drawable.type_grass
+                "ground" -> R.drawable.type_ground
+                "ice" -> R.drawable.type_ice
+                "normal" -> R.drawable.type_normal
+                "poison" -> R.drawable.type_poison
+                "psychic" -> R.drawable.type_psychic
+                "rock" -> R.drawable.type_rock
+                "steel" -> R.drawable.type_steel
+                "water" -> R.drawable.type_water
+                else -> R.drawable.type_none
+            }
+
+            Picasso.get()
+                .load(type1i)
+                .fit().centerCrop()
+                .into(type1)
+
+            Picasso.get()
+                .load(type2i)
+                .fit().centerCrop()
+                .into(type2)
+
 
             val num = pokemonProfile.id
             Picasso.get()
-                .load("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$num.png")
+                //.load("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$num.png")
+                .load("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other-sprites/official-artwork/$num.png")
                 .fit()
                 .centerCrop()
                 .placeholder(R.drawable.question_mark)

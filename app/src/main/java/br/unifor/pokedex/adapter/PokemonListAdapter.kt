@@ -36,11 +36,13 @@ class PokemonListAdapter(context: Context, private val pokemonList: ArrayList<Po
             if(position == pokemonList.size - 1){
                 onBottomReachedListener?.onBottomReached(position)
             }
-            holder.name.text = pokemonList[position].name
+
+            holder.name.text = pokemonList[position].name.capitalize()
+
             val num = pokemonList[position].url.drop(34).dropLast(1)
-            Log.i("APP", num)
             Picasso.get()
-                .load("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$num.png")
+                //.load("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$num.png")
+                .load("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other-sprites/official-artwork/$num.png")
                 .fit()
                 .centerCrop()
                 .placeholder(R.drawable.question_mark)

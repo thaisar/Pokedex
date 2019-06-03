@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
 
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
-        val pokemonListS = PokeApiService.getPokemonListService().getPokemonList(0, 807)
+        val pokemonListS = PokeApiService.getPokemonListService().getPokemonList(0, 720)
         pokemonListS.enqueue(pokemonListCallbackHandler)
 
     }
@@ -76,8 +76,9 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
 
     override fun onClick(view: View, position: Int) {
         val intent = Intent(this, PokemonProfileActivity::class.java)
-        intent.putExtra("pokemonId", position+1)
-        startActivityForResult(intent, 0)
+        val pokemonid = pokemonListResults[position].url.drop(34).dropLast(1).toInt()
+        intent.putExtra("pokemonId", pokemonid)
+        startActivity(intent)
     }
 
     override fun onLongClick(view: View, position: Int) {
