@@ -33,7 +33,10 @@ class PokemonProfileActivity: AppCompatActivity() {
         type1 = findViewById(R.id.imageViewType1)
         type2 = findViewById(R.id.imageViewType2)
 
-        val pokemonId = intent.getIntExtra("pokemonId", 0)
+        val pokemonId = intent.getStringExtra("pokemonId")
+
+//        val pokemonTeste = PokeApiService.getPokemonService().getPokemon(pokemonId)
+
         val pokemon = PokeApiService.getPokemonService().getPokemon(pokemonId)
         pokemon.enqueue(pokemonCallbackHandler)
     }

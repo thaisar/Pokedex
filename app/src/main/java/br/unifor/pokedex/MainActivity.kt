@@ -8,8 +8,11 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SearchView
 import android.util.Log
+import android.view.Menu
 import android.view.View
+import android.widget.Toast
 import br.unifor.pokedex.adapter.ItemClickHandle
 import br.unifor.pokedex.adapter.OnBottomReachedListener
 import br.unifor.pokedex.adapter.PokemonListAdapter
@@ -19,7 +22,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListener {
+class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListener, SearchView.OnQueryTextListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: PokemonListAdapter
@@ -29,6 +32,8 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
 
     private lateinit var pokemonList: PokemonList
     private lateinit var pokemonListResults: ArrayList<PokemonList.Results>
+    var listAux:List<PokemonList.Results> = ArrayList<PokemonList.Results>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +61,6 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
 
     }
 
-
-    @SuppressLint("ResourceAsColor")
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_home -> {
@@ -75,10 +78,23 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
     }
 
     override fun onClick(view: View, position: Int) {
-        val intent = Intent(this, PokemonProfileActivity::class.java)
-        val pokemonid = pokemonListResults[position].url.drop(34).dropLast(1).toInt()
-        intent.putExtra("pokemonId", pokemonid)
-        startActivity(intent)
+//        val intent = Intent(this, PokemonProfileActivity::class.java)
+//        val pokemonid = pokemonListResults[position].url.drop(34).dropLast(1).toInt()
+//        intent.putExtra("pokemonId", pokemonid)
+//        startActivity(intent)
+
+        val i = Intent(this, PokemonProfileActivity::class.java)
+
+        if (listAux.isEmpty()){
+            val pokemonId = pokemonListResults[position].name
+            i.putExtra("pokemonId", pokemonId)
+        }else {
+            val pokemonId = listAux[position].name
+            i.putExtra("pokemonId", pokemonId)
+
+        }
+
+        startActivity(i)
     }
 
     override fun onLongClick(view: View, position: Int) {
@@ -107,4 +123,46 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
         }
     }
 
+    @Override
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+        getMenuInflater().inflate(R.menu.menu_item, menu)
+
+        val menuItem = menu?.findItem(R.id.search)
+        val searchView = menuItem?.actionView as SearchView
+        searchView.setOnQueryTextListener(this)
+
+        return true
+    }
+
+    override fun onQueryTextSubmit(p0: String?): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onQueryTextChange(p0: String?): Boolean {
+
+        val userInput = p0.toString().toLowerCase()
+        val newList: ArrayList<PokemonList.Results> = ArrayList<PokemonList.Results>()
+        var cont = 0
+
+        Toast.makeText(this, p0, Toast.LENGTH_SHORT).show()
+
+        for (Pokemon in pokemonListResults) {
+
+            if(pokemonListResults[cont].name.toLowerCase().contains(userInput)) {
+
+                newList.add(pokemonListResults[cont])
+            }
+            cont++
+        }
+
+        if (userInput == ""){
+            adapter.updateList(pokemonListResults)
+        } else {
+            listAux = newList
+            adapter.updateList(newList)
+        }
+
+        return true
+    }
 }

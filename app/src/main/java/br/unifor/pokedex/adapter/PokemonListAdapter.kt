@@ -10,11 +10,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import br.unifor.pokedex.R
+import br.unifor.pokedex.model.Pokemon
 import br.unifor.pokedex.model.PokemonList
 import com.squareup.picasso.Picasso
 
 
-class PokemonListAdapter(context: Context, private val pokemonList: ArrayList<PokemonList.Results>) :
+class PokemonListAdapter(context: Context, private var pokemonList: ArrayList<PokemonList.Results>) :
     RecyclerView.Adapter<PokemonListAdapter.PokemonViewHolder>() {
 
     var itemClickHandleListener: ItemClickHandle? = null
@@ -67,5 +68,11 @@ class PokemonListAdapter(context: Context, private val pokemonList: ArrayList<Po
                 true
             }
         }
+    }
+
+    fun updateList (newList: ArrayList<PokemonList.Results>) {
+
+        pokemonList = newList
+        notifyDataSetChanged()
     }
 }
