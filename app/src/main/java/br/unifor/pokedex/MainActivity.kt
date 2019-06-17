@@ -1,9 +1,7 @@
 package br.unifor.pokedex
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -12,15 +10,20 @@ import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.Menu
 import android.view.View
-import android.widget.Toast
+import android.widget.ImageView
 import br.unifor.pokedex.adapter.ItemClickHandle
 import br.unifor.pokedex.adapter.OnBottomReachedListener
 import br.unifor.pokedex.adapter.PokemonListAdapter
 import br.unifor.pokedex.model.PokemonList
 import br.unifor.pokedex.service.PokeApiService
+import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
+
+
+
 
 class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListener, SearchView.OnQueryTextListener {
 
@@ -28,11 +31,10 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
     private lateinit var adapter: PokemonListAdapter
     private lateinit var layoutManager: LinearLayoutManager
 
-    private var state: Parcelable? = null
-
     private lateinit var pokemonList: PokemonList
     private lateinit var pokemonListResults: ArrayList<PokemonList.Results>
-    var listAux:List<PokemonList.Results> = ArrayList<PokemonList.Results>()
+    private lateinit var pokemonListResultsFavorite: ArrayList<PokemonList.Results>
+    private lateinit var pokemonListResultsSearch: List<PokemonList.Results>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +44,8 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
         pokemonListResults = arrayListOf()
+        pokemonListResultsFavorite = arrayListOf()
+        pokemonListResultsSearch = arrayListOf()
 
         recyclerView = findViewById(R.id.main_recyclerView)
 
@@ -65,12 +69,14 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
         when (item.itemId) {
             R.id.navigation_home -> {
 
-//                cardView.textViewCard.text = "home"
+                adapter = PokemonListAdapter(this, pokemonListResults)
+                recyclerView.adapter = adapter
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_favorites -> {
 
-//                cardView.textViewCard.text = "favorites"
+                adapter = PokemonListAdapter(this, pokemonListResultsFavorite)
+                recyclerView.adapter = adapter
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -78,29 +84,28 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
     }
 
     override fun onClick(view: View, position: Int) {
-//        val intent = Intent(this, PokemonProfileActivity::class.java)
-//        val pokemonid = pokemonListResults[position].url.drop(34).dropLast(1).toInt()
-//        intent.putExtra("pokemonId", pokemonid)
-//        startActivity(intent)
 
-        val i = Intent(this, PokemonProfileActivity::class.java)
+        val intent = Intent(this, PokemonProfileActivity::class.java)
 
-        if (listAux.isEmpty()){
+        if (pokemonListResultsSearch.isEmpty()){
             val pokemonId = pokemonListResults[position].name
-            i.putExtra("pokemonId", pokemonId)
+            intent.putExtra("pokemonId", pokemonId)
         }else {
-            val pokemonId = listAux[position].name
-            i.putExtra("pokemonId", pokemonId)
-
+            val pokemonId = pokemonListResultsSearch[position].name
+            intent.putExtra("pokemonId", pokemonId)
         }
 
-        startActivity(i)
+        startActivity(intent)
     }
 
+    override fun onClickFavoriteIcon(view: View, position: Int) {
+        //TODO
+    }
+
+    //não usado
     override fun onLongClick(view: View, position: Int) {
-        //TODO "ideias?"
     }
-
+    //não usado
     override fun onBottomReached(position: Int) {
 //        if(pokemonList.next != null){
 //            val strings = pokemonList.next!!.split("https://pokeapi.co/api/v2/pokemon/?offset=", "&limit=")
@@ -123,10 +128,9 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
         }
     }
 
-    @Override
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
-        getMenuInflater().inflate(R.menu.menu_item, menu)
+        menuInflater.inflate(R.menu.menu_item, menu)
 
         val menuItem = menu?.findItem(R.id.search)
         val searchView = menuItem?.actionView as SearchView
@@ -136,30 +140,25 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
     }
 
     override fun onQueryTextSubmit(p0: String?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return false
     }
 
     override fun onQueryTextChange(p0: String?): Boolean {
 
         val userInput = p0.toString().toLowerCase()
-        val newList: ArrayList<PokemonList.Results> = ArrayList<PokemonList.Results>()
-        var cont = 0
+        val newList: ArrayList<PokemonList.Results> = ArrayList()
 
-        Toast.makeText(this, p0, Toast.LENGTH_SHORT).show()
-
-        for (Pokemon in pokemonListResults) {
-
+        for ((cont, _) in pokemonListResults.withIndex()) {
             if(pokemonListResults[cont].name.toLowerCase().contains(userInput)) {
-
                 newList.add(pokemonListResults[cont])
             }
-            cont++
         }
 
         if (userInput == ""){
             adapter.updateList(pokemonListResults)
+            pokemonListResultsSearch = ArrayList()
         } else {
-            listAux = newList
+            pokemonListResultsSearch = newList
             adapter.updateList(newList)
         }
 

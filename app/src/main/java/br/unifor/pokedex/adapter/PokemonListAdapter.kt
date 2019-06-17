@@ -41,6 +41,7 @@ class PokemonListAdapter(context: Context, private var pokemonList: ArrayList<Po
             holder.name.text = pokemonList[position].name.capitalize()
 
             val num = pokemonList[position].url.drop(34).dropLast(1)
+
             Picasso.get()
                 //.load("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$num.png")
                 .load("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other-sprites/official-artwork/$num.png")
@@ -49,6 +50,8 @@ class PokemonListAdapter(context: Context, private var pokemonList: ArrayList<Po
                 .placeholder(R.drawable.question_mark)
                 .error(R.drawable.question_mark)
                 .into(holder.image)
+
+
         }
     }
 
@@ -56,22 +59,25 @@ class PokemonListAdapter(context: Context, private var pokemonList: ArrayList<Po
 
         var image: ImageView = item.findViewById(R.id.imageViewCard)
         var name: TextView = item.findViewById(R.id.textViewCard)
+        var icon: ImageView = item.findViewById(R.id.favoriteIconCard)
 
         init {
-            val layout = item.findViewById<ConstraintLayout>(R.id.card_constraintLayout)
-            layout.setOnClickListener {
+            item.setOnClickListener {
                 listener.onClick(it, adapterPosition)
             }
 
-            layout.setOnLongClickListener {
+            item.setOnLongClickListener {
                 listener.onLongClick(it, adapterPosition)
                 true
+            }
+
+            icon.setOnClickListener {
+                listener.onClickFavoriteIcon(it, adapterPosition)
             }
         }
     }
 
     fun updateList (newList: ArrayList<PokemonList.Results>) {
-
         pokemonList = newList
         notifyDataSetChanged()
     }
