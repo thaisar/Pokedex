@@ -1,16 +1,13 @@
 package br.unifor.pokedex.adapter
 
 import android.content.Context
-import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import br.unifor.pokedex.R
-import br.unifor.pokedex.model.Pokemon
 import br.unifor.pokedex.model.PokemonList
 import com.squareup.picasso.Picasso
 
@@ -51,7 +48,6 @@ class PokemonListAdapter(context: Context, private var pokemonList: ArrayList<Po
                 .error(R.drawable.question_mark)
                 .into(holder.image)
 
-
         }
     }
 
@@ -59,7 +55,6 @@ class PokemonListAdapter(context: Context, private var pokemonList: ArrayList<Po
 
         var image: ImageView = item.findViewById(R.id.imageViewCard)
         var name: TextView = item.findViewById(R.id.textViewCard)
-        var icon: ImageView = item.findViewById(R.id.favoriteIconCard)
 
         init {
             item.setOnClickListener {
@@ -69,10 +64,6 @@ class PokemonListAdapter(context: Context, private var pokemonList: ArrayList<Po
             item.setOnLongClickListener {
                 listener.onLongClick(it, adapterPosition)
                 true
-            }
-
-            icon.setOnClickListener {
-                listener.onClickFavoriteIcon(it, adapterPosition)
             }
         }
     }

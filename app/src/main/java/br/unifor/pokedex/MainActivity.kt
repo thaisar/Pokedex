@@ -11,18 +11,18 @@ import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.ImageView
+import android.widget.Toast
 import br.unifor.pokedex.adapter.ItemClickHandle
 import br.unifor.pokedex.adapter.OnBottomReachedListener
 import br.unifor.pokedex.adapter.PokemonListAdapter
 import br.unifor.pokedex.model.PokemonList
 import br.unifor.pokedex.service.PokeApiService
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.card_pokemon.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
-
-
+import kotlin.math.absoluteValue
 
 
 class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListener, SearchView.OnQueryTextListener {
@@ -30,6 +30,8 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: PokemonListAdapter
     private lateinit var layoutManager: LinearLayoutManager
+
+    private var atual:Int = 0
 
     private lateinit var pokemonList: PokemonList
     private lateinit var pokemonListResults: ArrayList<PokemonList.Results>
@@ -43,6 +45,7 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
+        atual = R.id.navigation_home
         pokemonListResults = arrayListOf()
         pokemonListResultsFavorite = arrayListOf()
         pokemonListResultsSearch = arrayListOf()
@@ -69,14 +72,23 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
         when (item.itemId) {
             R.id.navigation_home -> {
 
+                atual = R.id.navigation_home
                 adapter = PokemonListAdapter(this, pokemonListResults)
                 recyclerView.adapter = adapter
+
+                adapter.itemClickHandleListener = this
+                adapter.onBottomReachedListener = this
+
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_favorites -> {
 
+                atual = R.id.navigation_favorites
                 adapter = PokemonListAdapter(this, pokemonListResultsFavorite)
                 recyclerView.adapter = adapter
+                adapter.itemClickHandleListener = this
+                adapter.onBottomReachedListener = this
+
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -87,24 +99,44 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
 
         val intent = Intent(this, PokemonProfileActivity::class.java)
 
-        if (pokemonListResultsSearch.isEmpty()){
-            val pokemonId = pokemonListResults[position].name
-            intent.putExtra("pokemonId", pokemonId)
-        }else {
-            val pokemonId = pokemonListResultsSearch[position].name
-            intent.putExtra("pokemonId", pokemonId)
+
+        if (atual == R.id.navigation_favorites) {
+
+            if (pokemonListResultsSearch.isEmpty()){
+                val pokemonId = pokemonListResultsFavorite[position].name
+                intent.putExtra("pokemonId", pokemonId)
+            }else {
+                val pokemonId = pokemonListResultsSearch[position].name
+                intent.putExtra("pokemonId", pokemonId)
+            }
+        } else {
+            if (pokemonListResultsSearch.isEmpty()){
+                val pokemonId = pokemonListResults[position].name
+                intent.putExtra("pokemonId", pokemonId)
+            }else {
+                val pokemonId = pokemonListResultsSearch[position].name
+                intent.putExtra("pokemonId", pokemonId)
+            }
         }
+
 
         startActivity(intent)
     }
 
-    override fun onClickFavoriteIcon(view: View, position: Int) {
-        //TODO
+    override fun onLongClick(view: View, position: Int) {
+
+        if (atual == R.id.navigation_favorites) {
+            pokemonListResultsFavorite.remove(pokemonListResultsFavorite[position])
+            Toast.makeText(this, "Removido dos favoritos", Toast.LENGTH_SHORT).show()
+
+            adapter.notifyItemRemoved(position)
+
+        } else {
+            Toast.makeText(this, "Adicionado aos favoritos", Toast.LENGTH_SHORT).show()
+            pokemonListResultsFavorite.add(pokemonListResults[position])
+        }
     }
 
-    //não usado
-    override fun onLongClick(view: View, position: Int) {
-    }
     //não usado
     override fun onBottomReached(position: Int) {
 //        if(pokemonList.next != null){
@@ -148,18 +180,36 @@ class MainActivity : AppCompatActivity(), ItemClickHandle, OnBottomReachedListen
         val userInput = p0.toString().toLowerCase()
         val newList: ArrayList<PokemonList.Results> = ArrayList()
 
-        for ((cont, _) in pokemonListResults.withIndex()) {
-            if(pokemonListResults[cont].name.toLowerCase().contains(userInput)) {
-                newList.add(pokemonListResults[cont])
-            }
-        }
+        if (atual == R.id.navigation_favorites){
 
-        if (userInput == ""){
-            adapter.updateList(pokemonListResults)
-            pokemonListResultsSearch = ArrayList()
+            for ((cont, _) in pokemonListResultsFavorite.withIndex()) {
+                if(pokemonListResultsFavorite[cont].name.toLowerCase().contains(userInput)) {
+                    newList.add(pokemonListResultsFavorite[cont])
+                }
+            }
+
+            if (userInput == ""){
+                adapter.updateList(pokemonListResultsFavorite)
+                pokemonListResultsSearch = ArrayList()
+            } else {
+                pokemonListResultsSearch = newList
+                adapter.updateList(newList)
+            }
+
         } else {
-            pokemonListResultsSearch = newList
-            adapter.updateList(newList)
+            for ((cont, _) in pokemonListResults.withIndex()) {
+                if(pokemonListResults[cont].name.toLowerCase().contains(userInput)) {
+                    newList.add(pokemonListResults[cont])
+                }
+            }
+
+            if (userInput == ""){
+                adapter.updateList(pokemonListResults)
+                pokemonListResultsSearch = ArrayList()
+            } else {
+                pokemonListResultsSearch = newList
+                adapter.updateList(newList)
+            }
         }
 
         return true

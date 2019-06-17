@@ -20,6 +20,13 @@ class PokemonProfileActivity: AppCompatActivity() {
     private lateinit var name: TextView
     private lateinit var type1: ImageView
     private lateinit var type2: ImageView
+    private lateinit var id: TextView
+    private lateinit var peso: TextView
+    private lateinit var altura: TextView
+    private lateinit var exp:TextView
+    private lateinit var hab1:TextView
+    private lateinit var hab2:TextView
+    private lateinit var hab3:TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +39,13 @@ class PokemonProfileActivity: AppCompatActivity() {
         name = findViewById(R.id.textViewPokemonProfile)
         type1 = findViewById(R.id.imageViewType1)
         type2 = findViewById(R.id.imageViewType2)
+        id = findViewById(R.id.idTextView)
+        peso = findViewById(R.id.pesoTextView)
+        altura = findViewById(R.id.alturaTextView)
+        exp = findViewById(R.id.expTextView)
+        hab1 = findViewById(R.id.habilidade1TextView)
+        hab2 = findViewById(R.id.habilidade2TextView)
+        hab3 = findViewById(R.id.habilidade3TextView)
 
         val pokemonId = intent.getStringExtra("pokemonId")
 
@@ -53,9 +67,27 @@ class PokemonProfileActivity: AppCompatActivity() {
         override fun onResponse(call: Call<Pokemon>, response: Response<Pokemon>) {
             pokemonProfile = response.body()!!
             name.text = pokemonProfile.name.capitalize()
+            id.text = pokemonProfile.id.toString()
+            peso.text = pokemonProfile.weight.toString()
+            altura.text = pokemonProfile.height.toString()
+            exp.text = pokemonProfile.baseExperience.toString()
 
             val type1s: String?
             val type2s: String?
+
+            if(pokemonProfile.abilities.size == 1){
+                hab1.text = "*  " + pokemonProfile.abilities[0].ability.name.capitalize()
+                hab2.text = ""
+                hab3.text = ""
+            }else if (pokemonProfile.abilities.size == 2){
+                hab1.text = "*  " + pokemonProfile.abilities[0].ability.name.capitalize()
+                hab2.text = "*  " + pokemonProfile.abilities[1].ability.name.capitalize()
+                hab3.text = ""
+            } else {
+                hab1.text = "*  " + pokemonProfile.abilities[0].ability.name.capitalize()
+                hab2.text = "*  " + pokemonProfile.abilities[1].ability.name.capitalize()
+                hab3.text = "*  " + pokemonProfile.abilities[2].ability.name.capitalize()
+            }
 
             if(pokemonProfile.types.size == 2){
                 type1s = pokemonProfile.types[1].type.name

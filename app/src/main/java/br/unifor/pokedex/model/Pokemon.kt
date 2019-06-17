@@ -10,7 +10,8 @@ data class Pokemon(
     val height: Int,
     val weight: Int,
     val sprites: Sprites,
-    val types: List<PokemonType>
+    val types: List<PokemonType>,
+    val abilities: List<PokemonAbilities>
 ) {
     data class Sprites(
         @SerializedName("front_default")
@@ -25,6 +26,10 @@ data class Pokemon(
     data class NamedAPIResource (
         val name: String,
         val url: String
+    )
+
+    class PokemonAbilities (
+        val ability: NamedAPIResource
     )
 }
 
